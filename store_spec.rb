@@ -16,7 +16,7 @@ describe Order do
     end
 
     it "gets marked as charged" do
-      subject.charge("print", :stripe)
+      subject.charge(:stripe)
  
       expect(subject.status).to eq("charged")
     end
