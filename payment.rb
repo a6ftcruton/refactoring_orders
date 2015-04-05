@@ -2,7 +2,7 @@ class Payment
   attr_reader :order_total, :payment_status
 
   def initialize(order_type, order_total)
-    @order_type = order_type
+    @order_type  = order_type
     @order_total = order_total
   end
 
@@ -23,30 +23,30 @@ class Payment
   end
 
   def stripe
-    # if charge_credit_card(order_total)
+    if charge_credit_card(order_total)
       successful_payment
-    # else
-    #   failed_payment
-    # end
+    else
+      failed_payment
+    end
   end
 
   private
 
     def successful_payment
       send_email_receipt
-      @payment_status = "charged"
+      return true 
     end
 
     def failed_payment
       send_payment_failure_email
-      @payment_status = "failed"
+      return false
     end
 
-    def charge_credit_card
+    def charge_credit_card(order_total)
       true
     end
 
-    def charge_paypal_account
+    def charge_paypal_account(order_total)
       true
     end
 

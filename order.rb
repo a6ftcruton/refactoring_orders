@@ -1,20 +1,25 @@
 require './report_printer'
+require './report_printer_helpers'
 require './payment'
 
 class Order
-  include ReportPrinter
+  include ReportPrinterHelpers
 
-  attr_reader :quantity
-  attr_accessor :unit_price, :status
+  attr_reader :quantity, :order_number, :address, :order_type, :order_total, :status
+  attr_accessor :unit_price 
 
   def initialize(order_number, quantity, address, order_type)
     @order_number = order_number
-    @quantity     = quantity
     @address      = address
     @order_type   = order_type
+    if @order_type == "conference_ticket" && quantity > 1
+      raise"Conference tickets are limited to one per customer"
+    else
+      @quantity = quantity
+    end
   end
  
-  def unit_price # <-------- WIP
+  def unit_price
     2.00
   end
 
@@ -37,14 +42,14 @@ class Order
 
   def charge(payment_type)
     payment = Payment.new(@order_type, order_total)
-    if payment.send(payment_type) == "charged"
+    if payment.send(payment_type)
       @status = "charged"
     else
       @status = "failure"
     end
   end
 
-  # private 
+  private 
 
   def free_shipping?
     ["ebook", "conference_ticket"].include?(@order_type)
@@ -64,15 +69,5 @@ class Order
 
   def send_email_receipt
     # [send email receipt]
-  end
- 
-  # In real life, charges would happen here. For sake of this test, it simply returns true
-  def charge_paypal_account(amount)
-    true
-  end
- 
-  # In real life, charges would happen here. For sake of this test, it simply returns true
-  def charge_credit_card(amount)
-    true
   end
 end
